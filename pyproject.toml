@@ -23,5 +23,8 @@ dependencies = [
     "Werkzeug==2.3.7",
 ]
 
+[tool.setuptools]
+packages = {find = {include = ["backend*", "utils*"]}}
+
 [tool.vercel]
 entrypoint = "backend.app:app"
