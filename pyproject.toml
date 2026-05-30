@@ -7,7 +7,7 @@ name = "ElectricityAI"
 version = "0.1.0"
 description = "Electricity Demand Forecasting System"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9,<3.13"
 dependencies = [
     "Flask==2.3.3",
     "Flask-CORS==4.0.0",
