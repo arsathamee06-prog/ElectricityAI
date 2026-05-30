@@ -241,7 +241,7 @@ class ModelsManager:
             if scaler is None:
                 return None
             
-            seq_length = self.config['MODELS_CONFIG']['lstm']['sequence_length']
+            seq_length = self.models_config.get('lstm', {}).get('sequence_length', 24)
             
             # Normalize input data
             scaled_data = scaler.transform(data.reshape(-1, 1)).flatten()
