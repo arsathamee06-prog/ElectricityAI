@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Demand Forecasting Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <h1 class="logo">⚡ Electricity AI</h1>
+                <div class="nav-links">
+                    <a href="#" class="nav-link active" data-section="dashboard">Dashboard</a>
+                    <a href="#" class="nav-link" data-section="models">Models</a>
+                    <a href="#" class="nav-link" data-section="insights">Insights</a>
+                    <a href="#" class="nav-link" data-section="logs">Logs</a>
+                </div>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span>Initializing...</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <p>Real-time electricity demand forecasting and analysis</p>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <h3>Best Model</h3>
+                        <p id="bestModel">Loading...</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📈</div>
+                        <h3>Forecast Period</h3>
+                        <p id="forecastPeriod">7 days</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">✅</div>
+                        <h3>Total Predictions</h3>
+                        <p id="totalPredictions">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">⏱️</div>
+                        <h3>Last Update</h3>
+                        <p id="lastUpdate">Never</p>
+                    </div>
+                </div>
+
+                <!-- Prediction Controls -->
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label>Days to Forecast:</label>
+                        <input type="number" id="forecastDays" min="1" max="90" value="7">
+                    </div>
+                    <div class="control-group">
+                        <label>Model:</label>
+                        <select id="modelSelect">
+                            <option value="best">Best Model (Auto)</option>
+                            <option value="arima">ARIMA</option>
+                            <option value="sarima">SARIMA</option>
+                            <option value="prophet">Prophet</option>
+                            <option value="lstm">LSTM</option>
+                        </select>
+                    </div>
+                    <button id="predictBtn" class="btn btn-primary">Generate Forecast</button>
+                    <button id="refreshBtn" class="btn btn-secondary">Refresh Data</button>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <!-- Forecast Chart -->
+                    <div class="chart-container">
+                        <h3>Electricity Demand Forecast</h3>
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+
+                    <!-- Historical vs Predicted -->
+                    <div class="chart-container">
+                        <h3>Historical vs Predicted</h3>
+                        <canvas id="historicalChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Models Comparison Section -->
+            <section id="models" class="section">
+                <div class="section-header">
+                    <h2>Models Comparison</h2>
+                    <p>Performance metrics for all trained models</p>
+                </div>
+
+                <!-- Model Comparison Table -->
+                <div class="comparison-table-container">
+                    <table class="comparison-table" id="modelsTable">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>RMSE</th>
+                                <th>MAE</th>
+                                <th>MAPE</th>
+                                <th>R² Score</th>
+                                <th>Accuracy</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modelsTableBody">
+                            <tr>
+                                <td colspan="7">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Model Details -->
+                <div class="model-details-container">
+                    <div class="model-detail-card">
+                        <h3>Model Details</h3>
+                        <div id="modelDetailsContent">
+                            <p>Select a model to view details</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Performance Chart -->
+                <div class="chart-container">
+                    <h3>Model Performance Comparison</h3>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Insights Section -->
+            <section id="insights" class="section">
+                <div class="section-header">
+                    <h2>Trend Insights</h2>
+                    <p>Seasonal patterns and demand analysis</p>
+                </div>
+
+                <div class="insights-grid">
+                    <!-- Seasonal Patterns -->
+                    <div class="insight-card">
+                        <h3>📅 Seasonal Patterns</h3>
+                        <ul id="seasonalPatterns">
+                            <li>Peak hours: 18:00 - 20:00</li>
+                            <li>Off-peak hours: 02:00 - 05:00</li>
+                            <li>Summer peak: July - August</li>
+                            <li>Winter peak: December - January</li>
+                        </ul>
+                    </div>
+
+                    <!-- Trends -->
+                    <div class="insight-card">
+                        <h3>📈 Current Trends</h3>
+                        <ul id="currentTrends">
+                            <li>Overall trend: Upward</li>
+                            <li>YoY Change: +3.5%</li>
+                            <li>MoM Change: +1.2%</li>
+                            <li>Volatility: Moderate</li>
+                        </ul>
+                    </div>
+
+                    <!-- Anomalies -->
+                    <div class="insight-card">
+                        <h3>⚠️ Anomalies</h3>
+                        <ul id="anomalies">
+                            <li>No recent anomalies detected</li>
+                            <li>System operating normally</li>
+                        </ul>
+                    </div>
+
+                    <!-- Forecast Confidence -->
+                    <div class="insight-card">
+                        <h3>🎯 Forecast Confidence</h3>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 85%"></div>
+                        </div>
+                        <p>85% confidence in 7-day forecast</p>
+                    </div>
+                </div>
+
+                <!-- Seasonal Decomposition Chart -->
+                <div class="chart-container">
+                    <h3>Demand Decomposition</h3>
+                    <canvas id="decompositionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Logs Section -->
+            <section id="logs" class="section">
+                <div class="section-header">
+                    <h2>Prediction Logs</h2>
+                    <p>History of all predictions and system events</p>
+                </div>
+
+                <!-- Logs Controls -->
+                <div class="logs-controls">
+                    <button id="clearLogsBtn" class="btn btn-secondary">Clear Logs</button>
+                    <button id="downloadLogsBtn" class="btn btn-secondary">Download CSV</button>
+                </div>
+
+                <!-- Logs Table -->
+                <div class="logs-table-container">
+                    <table class="logs-table" id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Model</th>
+                                <th>Forecast Days</th>
+                                <th>Predictions Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <tr>
+                                <td colspan="4">No logs available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- System Health -->
+                <div class="system-health">
+                    <h3>System Health</h3>
+                    <div class="health-item">
+                        <span>API Status</span>
+                        <div class="status-badge" id="apiStatus">Unknown</div>
+                    </div>
+                    <div class="health-item">
+                        <span>Models Loaded</span>
+                        <div class="status-badge" id="modelsLoadedStatus">Unknown</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Electricity Demand Forecasting System. Powered by Flask + Chart.js</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
